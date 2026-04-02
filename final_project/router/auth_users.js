@@ -29,9 +29,12 @@ regd_users.post("/login", (req,res) => {
   const username = req.body.username;
   const password = req.body.password;
 
+  req.session.username = username;
+
   //Check if username or password is missing
   if (!username || !password) {
     return res.status(404).json({ message: "Error loggin in" });
+
   }
 
 
@@ -53,15 +56,27 @@ if (authenticatedUser(username, password))  {
 
 });
 
+function sessionChecker(req, res, next) {
+  if (req.session && req.session.username) {
+    next(); // User is logged in, proceed to the next middleware or route handler
+  } else {
+    return res.status(401).json({ message: "User not logged in!" });
+  }
+}
+
 // Add a book review
 regd_users.put("/auth/review/:isbn", (req, res) => {
   //Write your code here
   const isbn = req.params.isbn;
   const username = req.session.username;
-  const review = req.query.review;
+  console.log("JWT verified, user:", username);
+  const review = req.body.review;
+  console.log("review submitted:", review);
+
+  
 
   if (!username) {
-    return res.status(401).json({ message: "User not logged in! "});
+    return res.status(401).json({ message: "User not logged in!! "});
   }
 
   if (!books[isbn]) {
@@ -78,9 +93,11 @@ regd_users.put("/auth/review/:isbn", (req, res) => {
   return res.status(200).json({message: "Review added/modifed successfully", reviews: books[isbn].reviews });
 });
 
-regd_users.put("/auth/review/test", (req, res) => {
-    res.send("PUT route is working");
-});
+// regd_users.put("/auth/review/test", (req, res) => {
+//     const username = req.session.username
+//     console.log("JWT verified, user:", username);
+//     res.send("PUT route is working");
+// });
 
 module.exports.authenticated = regd_users;
 module.exports.isValid = isValid;

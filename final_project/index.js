@@ -16,7 +16,7 @@ app.use("/customer",session({secret:"fingerprint_customer",resave: true, saveUni
 app.use("/customer/auth/*", function auth(req,res,next){
     //Authentication Mechanism
     if (req.session.authorization) {
-        token = req.session.authorization['accessToken'];
+       let token = req.session.authorization['accessToken'];
         jwt.verify(token, "access", (err, user) => {
             if (!err) {
                 req.user = user;
@@ -35,6 +35,6 @@ const PORT =5000;
 
 app.use("/customer", customer_routes);
 app.use("/", genl_routes);
-app.use("/auth", regd_users);
+app.use("/customer", regd_users);
 
 app.listen(PORT,()=>console.log("Server is running"));
