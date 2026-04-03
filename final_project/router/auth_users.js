@@ -43,7 +43,7 @@ if (authenticatedUser(username, password))  {
     // Generate JWT acces token
     let accessToken = jwt.sign({
         date: password
-    }, 'access', { expiresIn: 60 });
+    }, 'access', { expiresIn: "1h" });
 
     //Store access token and username in session
     req.session.authorization = {
@@ -91,6 +91,30 @@ regd_users.put("/auth/review/:isbn", (req, res) => {
   books[isbn].reviews[username] = review;
 
   return res.status(200).json({message: "Review added/modifed successfully", reviews: books[isbn].reviews });
+});
+
+regd_users.delete("/auth/review/:isbn", (req, res) => {
+    const isbn = req.params.isbn;
+    const username = req.session.username;
+    console.log("JWT verified, user:", username);
+
+    if (!username) {
+        return res.status(401).json({ message: "User not logged in!" });
+    }
+
+    if (!books[isbn]) {
+        return res.status(404).json({ message: "Book not found!" });
+    }
+
+    if (!books[isbn].reviews[username]) {
+        return res.status(404).json({ message: "Review by user not found!" });
+    }
+
+    //Delete the user's review for the book
+    delete books[isbn].reviews[username];
+
+    return res.status(200).json({ message: "Review deleted sucessfully!" });
+
 });
 
 // regd_users.put("/auth/review/test", (req, res) => {

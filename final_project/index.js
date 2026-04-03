@@ -31,10 +31,18 @@ app.use("/customer/auth/*", function auth(req,res,next){
 });
 
 
-const PORT =5000;
+const port =5000;
 
+const booksApiRouter = require('./router/books_api');
+
+app.use('/api', booksApiRouter);
 app.use("/customer", customer_routes);
 app.use("/", genl_routes);
 app.use("/customer", regd_users);
 
-app.listen(PORT,()=>console.log("Server is running"));
+
+app.listen(port, () => {
+  console.log(`Server running at http://localhost:${port}`);
+});
+
+// app.listen(PORT,()=>console.log("Server is running"));
